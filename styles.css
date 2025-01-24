@@ -1,0 +1,110 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f3f4f6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Form Container */
+  .form-container {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px 30px;
+    max-width: 50%;
+    width: 100%;
+  }
+  
+  /* Form Header */
+  .form-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .form-header h2 {
+    font-size: 1.8rem;
+    color: #555;
+  }
+  
+  .form-header p {
+    font-size: 0.9rem;
+    color: #888;
+  }
+  
+  /* Form Inputs */
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    margin: 10px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Form Button */
+  .form-button {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .form-button button {
+    background-color: #007bff;
+    color: #ffffff;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .form-button button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Form Footer */
+  .form-footer {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #777;
+  }
+  
+  .form-footer a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .form-footer a:hover {
+    color: #0056b3;
+  }
+  

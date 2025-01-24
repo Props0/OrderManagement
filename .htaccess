@@ -1,0 +1,4 @@
+RewriteEngine On
+RewriteRule ^admin$ /blog.php [L]
+
+Options -Indexes

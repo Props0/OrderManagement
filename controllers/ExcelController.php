@@ -1,13 +1,19 @@
 <?php
-require 'vendor/autoload.php'; // Certifica-te de que instalas a biblioteca PhpSpreadsheet via Composer
+include_once 'CommonController.php';
+require  'EmailController.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
-
-class ExcelController {
+class ExcelController extends CommonController
+{
+    public function __construct()
+	{
+        require '../vendor/autoload.php';
+		parent::__construct();
+	}
     public function generateReport() {
-        $excelFilePath = 'example.xlsx';
+        $excelFilePath = '../example.xlsx';
         try {
             $spreadsheet = IOFactory::load($excelFilePath);
             $sheet = $spreadsheet->getActiveSheet();
@@ -33,7 +39,7 @@ class ExcelController {
     }
 
     public function writeToExcel($orders) {
-        $excelFilePath = 'example.xlsx';
+        $excelFilePath = '../example.xlsx';
         try {
             if (file_exists($excelFilePath)) {
                 $spreadsheet = IOFactory::load($excelFilePath);
@@ -45,7 +51,7 @@ class ExcelController {
             $data = $this->generateReport();
             $data = json_decode($data, true);
             $sheet = $spreadsheet->getActiveSheet();
-            foreach ($orders["order"] as $order) {
+            foreach ($orders as $order) {
                 if (isset($data['data'])) {
                     $order = array_merge($data['data'], $order);
                 }
@@ -59,16 +65,17 @@ class ExcelController {
 
             $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
             $writer->save($this->createNewFile());
+            echo json_encode(['message' => 'data escritos com sucesso!']);
 
-            return true;
         } catch (Exception $e) {
-            return ['error' => $e->getMessage()];
+
+            echo json_encode(['error' => $e->getMessage()]);
         }
     }
 
     public function createNewFile() {
-        $newFilePath = 'temp_' . uniqid() . '.xlsx';
-        $excelFilePath = 'example.xlsx';
+        $newFilePath = '../temp_' . uniqid() . '.xlsx';
+        $excelFilePath = '../example.xlsx';
         if (!file_exists($excelFilePath)) {
             throw new Exception("O ficheiro base '{$excelFilePath}' não foi encontrado.");
         }
@@ -80,4 +87,18 @@ class ExcelController {
         return $newFilePath;
     }
 }
-?>
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SERVER['REQUEST_URI'] != '') {
+    $controller = new ExcelController();
+    $params=(isset($_POST) && $_POST!=null) ? $_POST : ((isset($_GET) && $_GET!=null) ? $_GET : []);
+    if($_SERVER['REQUEST_METHOD'] === 'POST' && $params==null){
+        $params=json_decode(file_get_contents('php://input'),true);
+    }
+    $requesturl = $_SERVER['REQUEST_URI'];
+    $parts = explode("/", $requesturl);
+    $action_name = end($parts);
+    call_user_func_array(array($controller, $action_name), $params);
+}
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+ini_set('display_errors', 0);
+header('Content-Type: application/json');
