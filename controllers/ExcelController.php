@@ -66,7 +66,6 @@ class ExcelController extends CommonController
             header('Content-Disposition: attachment; filename="relatorio.xlsx"');
             header('Cache-Control: max-age=0');
 
-            // Escreve diretamente no output
             $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
             $writer->save('php://output');
 

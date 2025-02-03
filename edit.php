@@ -77,20 +77,13 @@
                     body: JSON.stringify(formData)
                 });
 
-                // Se a resposta for OK, assumimos que é o ficheiro Excel
                 if (response.ok) {
-                    // Obtem o blob (dados binários)
                     const blob = await response.blob();
-
-                    // Cria uma URL temporária para o blob
                     const url = window.URL.createObjectURL(blob);
-
-                    // Cria um elemento <a> para forçar o download
                     const a = document.createElement('a');
                     a.style.display = 'none';
                     a.href = url;
 
-                    // Se o servidor definir o cabeçalho 'Content-Disposition' com o nome do ficheiro, podemos usá-lo
                     const disposition = response.headers.get('Content-Disposition');
                     let fileName = 'relatorio.xlsx';
                     if (disposition && disposition.indexOf('attachment') !== -1) {
@@ -101,16 +94,11 @@
                         }
                     }
                     a.download = fileName;
-
-                    // Adiciona o elemento ao DOM, clica e remove-o
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
-
-                    // Liberta a URL temporária
                     window.URL.revokeObjectURL(url);
                 } else {
-                    // Caso a resposta não seja OK, pode ser que seja um erro em JSON
                     const text = await response.text();
                     const result = JSON.parse(text);
                     alert(result.message);
