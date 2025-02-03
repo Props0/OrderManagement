@@ -9,40 +9,58 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="form-container">
-        <h1>Gestor de Encomendas</h1>
-        <form id="excelForm" class="form-group">
-            <div class="ordergroup" id="ordergroup">
-                <h4 class="form-header">Encomenda N1</h4>
-                <input name="orders[0][Nome do Destinatário]" id="name"  placeholder='Nome do Destinatário'></input>    
-                <input name="orders[0][Morada do Destinatário linha 1]" id="address"  rows="5" cols="5" placeholder='Morada do Destinatário linha 1'></input>
-                <input name="orders[0][Morada do Destinatário linha 2]" id="address2"  rows="5" cols="5" placeholder='Morada do Destinatário linha 2'></input>
-                <input name="orders[0][Código Postal Destinatário]" id="postalcode"  placeholder='Código Postal Destinatário'></input>
-                <input name="orders[0][Localidade Postal do Destinatário]" id="postalcode2"  placeholder='Localidade Postal do Destinatário'></input>
-                <input name="orders[0][Localidade do Destinatário]" id="city"  placeholder='Localidade do Destinatário'></input>
-                <input name="orders[0][Região Destinatário]" id="region"  placeholder='Região Destinatário'></input>
-                <input name="orders[0][Pais de Destino]" id="country" placeholder='Pais de Destino'></input>
-                <input name="orders[0][Endereço Email Destinatário]" id="email"  placeholder='Endereço Email Destinatário'></input>
-            </div>
-            <br>
-        </form>
-        <button type="button" onclick="addshipmentcontact()">Adicionar contacto</button>
-    
-        <button type="button" onclick="submit()">Submeter</button>
+<div class="container mt-5">
+        <div class="card shadow p-4">
+            <h1 class="text-center mb-4 text-primary">Gestor de Encomendas</h1>
+            <form id="excelForm">
+                <div class="ordergroup border rounded p-3 mb-3" id="ordergroup">
+                    <h4 class="form-header text-secondary" id="titleorder">Encomenda N1</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input class="form-control" name="orders[0][Nome do Destinatário]" placeholder="Nome do Destinatário">
+                        </div>
+                        <div class="col-md-6">
+                            <input class="form-control" name="orders[0][Morada do Destinatário linha 1]" placeholder="Morada linha 1">
+                        </div>
+                        <div class="col-md-6">
+                            <input class="form-control" name="orders[0][Morada do Destinatário linha 2]" placeholder="Morada linha 2">
+                        </div>
+                        <div class="col-md-6">
+                            <input class="form-control" name="orders[0][Código Postal Destinatário]" placeholder="Código Postal">
+                        </div>
+                        <div class="col-md-6">
+                            <input class="form-control" name="orders[0][Localidade Postal do Destinatário]" placeholder="Localidade Postal">
+                        </div>
+                        <div class="col-md-6">
+                            <input class="form-control" name="orders[0][Localidade do Destinatário]" placeholder="Localidade">
+                        </div>
+                        <div class="col-md-6">
+                            <input class="form-control" name="orders[0][Região Destinatário]" placeholder="Região">
+                        </div>
+                        <div class="col-md-6">
+                            <input class="form-control" name="orders[0][Pais de Destino]" placeholder="País">
+                        </div>
+                        <div class="col-12">
+                            <input class="form-control" name="orders[0][Endereço Email Destinatário]" placeholder="Email">
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <button class="btn btn-success w-100 my-2" type="button" onclick="addshipmentcontact()">Adicionar Encomenda</button>
+            <button class="btn btn-primary w-100" type="button" onclick="submit()">Submeter</button>
+        </div>
     </div>
-    
-    <div id="relatorio"></div>
 
     <script>
-        var contactnumber = 1;
+        var contactnumber = 0;
         async function addshipmentcontact() {
-            $('#excelForm').append('<div class="ordergroup" id="ordergroup'+(contactnumber+1)+'"><h4 class="form-header">Encomenda N'+(contactnumber+1)+"</h4>")
-            $('#ordergroup :input').each(function() {
-                var copy = $(this).clone()
-                $('#excelForm').append(copy.attr('id', $(this).attr('id')+contactnumber).attr('name', "orders["+contactnumber+"]["+$(this).attr('name').split("[")[2]))
-            });
-            $('#excelForm').append("</div>")
             contactnumber++;
+            neworder = $('#ordergroup').clone();
+            neworder.find(':input').each(function() {
+                $(this).attr('id', $(this).attr('id')+contactnumber).attr('name', "orders["+contactnumber+"]["+$(this).attr('name').split("[")[2])
+            });
+            neworder.find("#titleorder").html("Encomenda N"+(contactnumber+1));
+            $('#excelForm').append(neworder)
         }
         async function submit() {
             let formData = {};
@@ -56,10 +74,47 @@
                 const response = await fetch('controllers/ExcelController.php/writeToExcel', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body:  JSON.stringify(formData)
+                    body: JSON.stringify(formData)
                 });
-                const result = await response.text();
-                alert($.parseJSON(result).message);
+
+                // Se a resposta for OK, assumimos que é o ficheiro Excel
+                if (response.ok) {
+                    // Obtem o blob (dados binários)
+                    const blob = await response.blob();
+
+                    // Cria uma URL temporária para o blob
+                    const url = window.URL.createObjectURL(blob);
+
+                    // Cria um elemento <a> para forçar o download
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+
+                    // Se o servidor definir o cabeçalho 'Content-Disposition' com o nome do ficheiro, podemos usá-lo
+                    const disposition = response.headers.get('Content-Disposition');
+                    let fileName = 'relatorio.xlsx';
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        const matches = filenameRegex.exec(disposition);
+                        if (matches != null && matches[1]) {
+                            fileName = matches[1].replace(/['"]/g, '');
+                        }
+                    }
+                    a.download = fileName;
+
+                    // Adiciona o elemento ao DOM, clica e remove-o
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+
+                    // Liberta a URL temporária
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    // Caso a resposta não seja OK, pode ser que seja um erro em JSON
+                    const text = await response.text();
+                    const result = JSON.parse(text);
+                    alert(result.message);
+                }
             } catch (error) {
                 console.log(error);
                 alert("Erro ao enviar data.");

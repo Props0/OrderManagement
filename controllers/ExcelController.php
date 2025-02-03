@@ -62,9 +62,14 @@ class ExcelController extends CommonController
                 }
                 $row++;
             }
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="relatorio.xlsx"');
+            header('Cache-Control: max-age=0');
 
+            // Escreve diretamente no output
             $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-            $writer->save($this->createNewFile());
+            $writer->save('php://output');
+
             echo json_encode(['message' => 'data escritos com sucesso!']);
 
         } catch (Exception $e) {
