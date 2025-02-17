@@ -40,18 +40,21 @@ class ExcelController extends CommonController
 
     public function writeToExcel($orders) {
         $excelFilePath = '../example.xlsx';
+        $debug="";
         try {
             if (file_exists($excelFilePath)) {
                 $spreadsheet = IOFactory::load($excelFilePath);
             } else {
                 $spreadsheet = new Spreadsheet();
             }
-          
+            $debug.="Loaded excel file\n";
             $row = 2;
             $data = $this->generateReport();
             $data = json_decode($data, true);
             $sheet = $spreadsheet->getActiveSheet();
+            $debug.="Loaded all data\n";
             foreach ($orders as $order) {
+                $debug.="Reading order\n";
                 if (isset($data['data'])) {
                     $order = array_merge($data['data'], $order);
                 }
@@ -62,18 +65,19 @@ class ExcelController extends CommonController
                 }
                 $row++;
             }
+            $debug.="Write all data\n";
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment; filename="relatorio.xlsx"');
             header('Cache-Control: max-age=0');
 
             $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
             $writer->save('php://output');
-
+            $debug.="Download File\n";
             echo json_encode(['message' => 'data escritos com sucesso!']);
 
         } catch (Exception $e) {
 
-            echo json_encode(['error' => $e->getMessage()]);
+            echo json_encode(['error' => $debug . $e->getMessage()]);
         }
     }
 
