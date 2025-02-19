@@ -3,7 +3,7 @@
 class CommonController {
 private $servername = "localhost";
 	private $username = "root";
-	private $dbname="mocsa";
+	private $dbname="timer";
 	private $pass ="";
 	public $table="";
 	private $conn;
